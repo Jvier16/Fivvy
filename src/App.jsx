@@ -323,7 +323,7 @@ function LSModal({ onClose, onSuccess }) {
 
           <div className="ls-block">
             <div className="ls-header">
-              <div className="ls-title">flujo. Premium</div>
+              <div className="ls-title">fivvy. Premium</div>
               <div className="ls-logo"><span className="ls-logo-icon">🍋</span> Lemon Squeezy</div>
             </div>
 
@@ -466,7 +466,7 @@ export default function App() {
       <div className="app">
 
         <nav className="nav">
-          <div className="logo">flujo<span>.</span></div>
+          <div className="logo">fivvy<span>.</span></div>
           <div className="nav-right">
             <span className={`plan-badge ${isPremium?"premium":""}`}>{isPremium?"⭐ Premium":"Free"}</span>
             {!isPremium && <button className="btn btn-premium" onClick={()=>setShowPay(true)}>Mejorar plan</button>}
