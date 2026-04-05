@@ -1,654 +1,370 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from “react”;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 🍋 LEMON SQUEEZY CONFIG
-// Reemplaza estas URLs con las de tu cuenta en lemonsqueezy.com
-// Cómo obtenerlas: Dashboard → Tu Producto → "Share" → "Checkout URL"
-// ─────────────────────────────────────────────────────────────────────────────
-const LS_CONFIG = {
-  monthly: {
-    checkoutUrl: "https://fivvy.lemonsqueezy.com/checkout/buy/e7428f00-c313-4a01-9740-9a6dcd493540",
-    price: "$9.99",
-    period: "/mes",
-    label: "Mensual",
-  },
-  annual: {
-    checkoutUrl: "https://fivvy.lemonsqueezy.com/checkout/buy/1e50049c-8a5e-47f5-aa64-f805bfdf3ce2",
-    price: "$79.99",
-    period: "/año",
-    label: "Anual — ahorra 33%",
-  },
+// ─────────────────────────────────────────────────────────────────
+// 🍋 LEMON SQUEEZY — reemplaza con tus URLs
+const LS_MONTHLY = “https://TU_TIENDA.lemonsqueezy.com/checkout/buy/TU_VARIANT_MENSUAL”;
+const LS_ANNUAL  = “https://TU_TIENDA.lemonsqueezy.com/checkout/buy/TU_VARIANT_ANUAL”;
+// ─────────────────────────────────────────────────────────────────
+
+const G = `@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');`;
+
+const CSS = `${G} *,*::before,*::after{box-sizing:border-box;margin:0;padding:0} :root{ --ink:#0f0f0f;--paper:#f7f6f2;--cream:#eeecea;--line:#e0ddd8; --green:#1a7a4a;--red:#c0392b;--gold:#b8860b;--muted:#8a8680;--card:#ffffff; } html{font-size:16px} body{background:var(--paper);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased} .wrap{max-width:720px;margin:0 auto;padding:0 1.25rem 4rem} .header{display:flex;align-items:center;justify-content:space-between;padding:1.75rem 0 1.5rem;border-bottom:2px solid var(--ink)} .logo{font-family:'Instrument Serif',serif;font-size:1.6rem;letter-spacing:-0.5px} .logo em{font-style:italic;color:var(--muted)} .badge{font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;padding:.3rem .65rem;border:1px solid var(--line);border-radius:2px;color:var(--muted)} .badge.pro{border-color:var(--gold);color:var(--gold);background:rgba(184,134,11,.06)} .btn-upgrade{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.4rem .85rem;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer} .nav{display:flex;border-bottom:1px solid var(--line);margin-bottom:1.75rem} .nav-btn{flex:1;padding:.9rem .5rem;background:none;border:none;border-bottom:2px solid transparent;font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:-1px} .nav-btn:hover{color:var(--ink)} .nav-btn.on{color:var(--ink);border-bottom-color:var(--ink)} .hero{padding:2.5rem 0 2rem;text-align:center;border-bottom:1px solid var(--line);margin-bottom:2rem} .hero-label{font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem} .hero-amt{font-family:'Instrument Serif',serif;font-size:clamp(2.8rem,8vw,4.5rem);letter-spacing:-2px;line-height:1} .pos{color:var(--green)}.neg{color:var(--red)} .hero-sub{display:flex;justify-content:center;gap:2.5rem;margin-top:1.25rem} .stat-label{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem} .stat-val{font-family:'Instrument Serif',serif;font-size:1.35rem;letter-spacing:-.5px} .form-card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1.25rem;margin-bottom:2rem} .form-lbl{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem} .row1{display:grid;grid-template-columns:1fr 100px;gap:.6rem;margin-bottom:.6rem} .row2{display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem} .inp{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:.6rem .75rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;color:var(--ink);outline:none;transition:border-color .15s} .inp:focus{border-color:var(--ink)} .inp::placeholder{color:var(--muted)} .inp option{background:var(--paper)} .seg{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden} .seg button{flex:1;padding:.6rem;border:none;background:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:.8rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s} .seg button.exp{background:var(--red);color:#fff} .seg button.inc{background:var(--green);color:#fff} .add-btn{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.6rem 1.1rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap} .sec-lbl{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem} .tx-list{display:flex;flex-direction:column} .tx{display:flex;align-items:center;gap:.9rem;padding:.9rem 0;border-bottom:1px solid var(--line)} .tx:last-child{border-bottom:none} .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0} .tx-body{flex:1;min-width:0} .tx-name{font-size:.875rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .tx-meta{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.1rem} .tx-amt{font-family:'Instrument Serif',serif;font-size:1.1rem;flex-shrink:0} .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;opacity:.35;transition:opacity .15s;flex-shrink:0} .del-btn:hover{opacity:1;color:var(--red)} .empty{text-align:center;padding:3rem 0;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:1px} .bud-list{display:flex;flex-direction:column;gap:.85rem} .bud{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1rem 1.1rem} .bud-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.55rem} .bud-cat{font-size:.875rem;font-weight:600} .bud-nums{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--muted)} .track{height:4px;background:var(--line);border-radius:2px;overflow:hidden} .fill{height:100%;border-radius:2px;transition:width .4s ease} .bud-pct{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.3rem;text-align:right} .paywall{border:1.5px dashed var(--line);border-radius:4px;padding:2.5rem 1.5rem;text-align:center;margin-top:1.5rem} .paywall h2{font-family:'Instrument Serif',serif;font-size:1.45rem;margin-bottom:.4rem} .paywall p{font-size:.83rem;color:var(--muted);max-width:300px;margin:0 auto 1.25rem;line-height:1.6} .paywall ul{list-style:none;max-width:220px;margin:0 auto 1.25rem;text-align:left;display:flex;flex-direction:column;gap:.35rem} .paywall ul li{font-size:.8rem;color:var(--muted)} .paywall ul li::before{content:'→ '} .btn-pay{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.7rem 1.4rem;font-family:inherit;font-size:.875rem;font-weight:600;cursor:pointer} .overlay{position:fixed;inset:0;background:rgba(15,15,15,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;animation:fi .2s ease} .modal{background:var(--paper);border:1.5px solid var(--ink);border-radius:4px;padding:2rem;max-width:440px;width:93%;animation:su .2s ease;max-height:92vh;overflow-y:auto} .btoggle{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-bottom:1.1rem} .btoggle button{flex:1;padding:.52rem;border:none;background:none;font-family:inherit;font-size:.8rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s} .btoggle button.on{background:var(--ink);color:var(--paper)} .plans{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.1rem} .plan{border:1.5px solid var(--line);border-radius:3px;padding:1rem;cursor:pointer;transition:all .15s} .plan:hover{border-color:var(--ink)} .plan.sel{border-color:var(--ink);background:var(--cream)} .plan-name{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem} .plan-price{font-family:'Instrument Serif',serif;font-size:1.5rem;letter-spacing:-.5px} .plan-price span{font-family:inherit;font-size:.72rem;color:var(--muted);font-style:normal} .plan-save{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--green);margin-top:.15rem} .plan-feats{list-style:none;margin-top:.65rem;display:flex;flex-direction:column;gap:.28rem} .plan-feats li{font-size:.72rem;display:flex;gap:.3rem} .plan-feats li.y{color:var(--ink)}.plan-feats li.y::before{content:'✓';font-weight:700} .plan-feats li.n{color:var(--muted)}.plan-feats li.n::before{content:'–'} .order{background:var(--cream);border:1px solid var(--line);border-radius:3px;padding:.85rem 1rem;margin-bottom:.9rem} .order-row{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.22rem} .order-row .ol{color:var(--muted)} .order-div{border:none;border-top:1px solid var(--line);margin:.45rem 0} .order-total{display:flex;justify-content:space-between;font-family:'Instrument Serif',serif;font-size:1.05rem} .methods{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.9rem} .method{font-family:'IBM Plex Mono',monospace;font-size:.65rem;background:var(--cream);border:1px solid var(--line);border-radius:2px;padding:.18rem .45rem;color:var(--muted)} .btn-main{width:100%;padding:.82rem;background:var(--ink);color:var(--paper);border:none;border-radius:3px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem} .btn-main:hover{opacity:.85} .btn-main:disabled{opacity:.35;cursor:not-allowed} .btn-ghost{width:100%;padding:.72rem;background:none;color:var(--ink);border:1px solid var(--line);border-radius:3px;font-family:inherit;font-size:.875rem;font-weight:500;cursor:pointer;margin-top:.45rem} .btn-demo{background:none;border:none;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:.65rem;cursor:pointer;text-decoration:underline;display:block;margin:.65rem auto 0} .back-btn{background:none;border:1px solid var(--line);border-radius:3px;padding:.33rem .65rem;font-family:inherit;font-size:.78rem;cursor:pointer;margin-right:.65rem} .spin{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:rot .8s linear infinite;margin:0 auto 1rem} .check-icon{font-size:2.8rem;display:block;margin-bottom:.85rem;animation:po .35s ease} @keyframes fi{from{opacity:0}to{opacity:1}} @keyframes su{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}} @keyframes rot{to{transform:rotate(360deg)}} @keyframes po{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}} @media(max-width:480px){ .row1{grid-template-columns:1fr} .row2{grid-template-columns:1fr 1fr} .add-btn{grid-column:1/-1} .plans{grid-template-columns:1fr} .hero-sub{gap:1.5rem} }`;
+
+const CATS = {
+Comida:”#c0392b”, Transporte:”#2980b9”, Ocio:”#8e44ad”,
+Salud:”#27ae60”, Servicios:”#d35400”, Ropa:”#16a085”, Otro:”#7f8c8d”
 };
-// ─────────────────────────────────────────────────────────────────────────────
-
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap');`;
-
-const style = `
-  ${FONTS}
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
-    --border: rgba(255,255,255,0.07); --accent: #c8ff00;
-    --text: #f0f0f5; --muted: #6b6b80; --danger: #ff4d6d;
-    --success: #00e5a0; --gold: #ffd166;
-  }
-  body { background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; min-height: 100vh; }
-  .app { min-height: 100vh; display: flex; flex-direction: column; }
-
-  .nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(16px); }
-  .logo { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--accent); }
-  .logo span { color: var(--text); }
-  .nav-right { display: flex; gap: 0.75rem; align-items: center; }
-  .plan-badge { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 1px; padding: 0.3rem 0.7rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); text-transform: uppercase; }
-  .plan-badge.premium { border-color: var(--gold); color: var(--gold); }
-
-  .tabs { display: flex; gap: 0.25rem; padding: 1.5rem 2rem 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
-  .tab { padding: 0.6rem 1.25rem; border-radius: 8px 8px 0 0; background: none; border: 1px solid transparent; border-bottom: none; color: var(--muted); cursor: pointer; font-family: 'Sora', sans-serif; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
-  .tab:hover { color: var(--text); }
-  .tab.active { background: var(--surface); border-color: var(--border); color: var(--accent); }
-
-  .main { flex: 1; padding: 2rem; max-width: 1100px; margin: 0 auto; width: 100%; }
-
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden; transition: border-color 0.2s; }
-  .kpi:hover { border-color: rgba(200,255,0,0.2); }
-  .kpi-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.6rem; font-family: 'DM Mono', monospace; }
-  .kpi-value { font-family: 'DM Serif Display', serif; font-size: 2rem; }
-  .kpi-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
-  .kpi-glow { position: absolute; top: -30px; right: -30px; width: 80px; height: 80px; border-radius: 50%; filter: blur(30px); opacity: 0.15; }
-
-  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
-  .section-title .muted { font-family: 'Sora', sans-serif; font-size: 0.75rem; color: var(--muted); font-weight: 400; }
-
-  .tx-list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .tx { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; transition: all 0.15s; }
-  .tx:hover { border-color: rgba(255,255,255,0.12); transform: translateX(2px); }
-  .tx-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-  .tx-info { flex: 1; }
-  .tx-name { font-size: 0.9rem; font-weight: 500; }
-  .tx-cat { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 0.1rem; }
-  .tx-amount { font-family: 'DM Mono', monospace; font-size: 0.95rem; font-weight: 500; }
-  .tx-date { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; }
-
-  .add-form { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end; }
-  .field { display: flex; flex-direction: column; gap: 0.4rem; }
-  .field label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-family: 'DM Mono', monospace; }
-  .field input, .field select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 0.6rem 0.85rem; font-family: 'Sora', sans-serif; font-size: 0.875rem; outline: none; transition: border-color 0.2s; }
-  .field input:focus, .field select:focus { border-color: var(--accent); }
-  .field select option { background: var(--surface); }
-
-  .btn { padding: 0.65rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'Sora', sans-serif; font-size: 0.875rem; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; }
-  .btn-accent { background: var(--accent); color: #0a0a0f; }
-  .btn-accent:hover { background: #d4ff1a; transform: translateY(-1px); }
-  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: rgba(255,255,255,0.2); }
-  .btn-danger { background: rgba(255,77,109,0.12); color: var(--danger); border: 1px solid rgba(255,77,109,0.2); padding: 0.3rem 0.6rem; font-size: 0.75rem; border-radius: 6px; }
-  .btn-premium { background: linear-gradient(135deg, var(--gold), #f4a261); color: #0a0a0f; }
-  .btn-premium:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,209,102,0.4); }
-
-  .budget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-  .budget-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; }
-  .budget-header { display: flex; justify-content: space-between; margin-bottom: 0.75rem; align-items: flex-start; }
-  .budget-cat { font-size: 0.85rem; font-weight: 600; }
-  .budget-amounts { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); }
-  .progress-track { background: var(--surface2); border-radius: 999px; height: 6px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
-  .budget-pct { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 0.4rem; text-align: right; }
-
-  .locked-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 3rem 2rem; text-align: center; position: relative; overflow: hidden; }
-  .locked-section::before { content:''; position:absolute; inset:0; background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(255,209,102,0.05)); }
-  .locked-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-  .locked-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
-  .locked-desc { color: var(--muted); font-size: 0.875rem; max-width: 360px; margin: 0 auto 1.5rem; line-height: 1.6; }
-  .features-list { list-style: none; text-align: left; max-width: 280px; margin: 0 auto 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
-  .features-list li { font-size: 0.85rem; display: flex; gap: 0.5rem; align-items: center; }
-  .features-list li::before { content:'✓'; color: var(--gold); font-weight: 700; }
-
-  /* ── MODAL ── */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.2s ease; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; max-width: 520px; width: 94%; animation: slideUp 0.25s ease; max-height: 92vh; overflow-y: auto; }
-
-  /* ── PRICING TOGGLE ── */
-  .pricing-toggle { display: flex; background: var(--surface2); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; }
-  .pricing-toggle button { flex:1; padding: 0.5rem; border: none; border-radius: 7px; background: none; color: var(--muted); cursor: pointer; font-family: 'Sora', sans-serif; font-size: 0.82rem; font-weight: 500; transition: all 0.2s; }
-  .pricing-toggle button.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-
-  /* ── PLAN CARDS ── */
-  .plan-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-  .plan-card { background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 1.25rem; cursor: pointer; transition: all 0.2s; }
-  .plan-card:hover { border-color: rgba(255,255,255,0.15); }
-  .plan-card.sel-free { border-color: var(--accent); background: rgba(200,255,0,0.04); }
-  .plan-card.sel-premium { border-color: var(--gold); background: rgba(255,209,102,0.05); }
-  .plan-name-badge { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
-  .plan-price-big { font-family: 'DM Serif Display', serif; font-size: 1.75rem; margin-bottom: 0.2rem; }
-  .plan-price-big .per { font-family: 'Sora', sans-serif; font-size: 0.78rem; color: var(--muted); font-weight: 400; }
-  .save-badge { display: inline-block; background: rgba(200,255,0,0.12); color: var(--accent); font-size: 0.65rem; font-family: 'DM Mono', monospace; padding: 0.15rem 0.5rem; border-radius: 4px; margin-top: 0.2rem; }
-  .plan-feats { list-style: none; margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
-  .plan-feats li { font-size: 0.75rem; display: flex; gap: 0.4rem; }
-
-  /* ── LS CHECKOUT BLOCK ── */
-  .ls-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.25rem; }
-  .ls-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
-  .ls-title { font-size: 0.85rem; font-weight: 600; }
-  .ls-logo { display: flex; align-items: center; gap: 0.4rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
-  .ls-logo-icon { font-size: 1rem; }
-
-  .order-row { display: flex; justify-content: space-between; font-size: 0.83rem; margin-bottom: 0.4rem; }
-  .order-row .ol { color: var(--muted); }
-  .order-divider { border: none; border-top: 1px solid var(--border); margin: 0.6rem 0; }
-  .order-total { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 1rem; font-weight: 600; }
-
-  .ls-methods { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-  .ls-method { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.75rem; font-size: 0.75rem; color: var(--muted); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 0.3rem; }
-
-  .btn-ls { width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem; border-radius: 10px; background: #ffd166; color: #0a0a0f; border: none; font-weight: 700; cursor: pointer; font-family: 'Sora', sans-serif; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
-  .btn-ls:hover { background: #ffe085; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,209,102,0.35); }
-
-  .ls-note { text-align: center; font-size: 0.7rem; color: var(--muted); margin-top: 0.75rem; font-family: 'DM Mono', monospace; line-height: 1.5; }
-
-  .ls-config-warning { background: rgba(255,77,109,0.08); border: 1px solid rgba(255,77,109,0.25); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: 0.82rem; }
-  .ls-config-warning strong { color: var(--danger); display: block; margin-bottom: 0.35rem; }
-  .ls-config-warning code { font-family: 'DM Mono', monospace; font-size: 0.78rem; background: rgba(255,255,255,0.06); padding: 0.15rem 0.4rem; border-radius: 4px; }
-
-  /* ── WAITING MODAL ── */
-  .waiting-block { text-align: center; padding: 1.5rem 0; }
-  .ls-spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 1.25rem; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── SUCCESS ── */
-  .success-icon { font-size: 3.5rem; display: block; margin-bottom: 1rem; animation: popIn 0.4s ease; }
-  @keyframes popIn { from { transform: scale(0.5); opacity:0; } to { transform:scale(1); opacity:1; } }
-
-  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
-  .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 120px; }
-  .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; height:100%; justify-content:flex-end; }
-  .bar { width:100%; border-radius:6px 6px 0 0; min-height:4px; }
-  .bar-label { font-size:0.65rem; color:var(--muted); font-family:'DM Mono',monospace; }
-  .alert { background: rgba(255,209,102,0.07); border: 1px solid rgba(255,209,102,0.2); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-
-  @keyframes fadeIn { from{opacity:0;}to{opacity:1;} }
-  @keyframes slideUp { from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;} }
-
-  @media(max-width:620px){
-    .nav{padding:1rem;} .main{padding:1rem;}
-    .form-grid{grid-template-columns:1fr 1fr;}
-    .kpi-grid{grid-template-columns:1fr 1fr;}
-    .plan-compare{grid-template-columns:1fr;}
-  }
-`;
-
-const CATEGORIES = [
-  { name:"Comida",          icon:"🍔", color:"#f4845f" },
-  { name:"Transporte",      icon:"🚌", color:"#4cc9f0" },
-  { name:"Entretenimiento", icon:"🎮", color:"#7c3aed" },
-  { name:"Salud",           icon:"💊", color:"#00e5a0" },
-  { name:"Ropa",            icon:"👕", color:"#c8ff00" },
-  { name:"Servicios",       icon:"💡", color:"#ffd166" },
-  { name:"Ingresos",        icon:"💰", color:"#00e5a0" },
-  { name:"Otro",            icon:"📦", color:"#6b6b80" },
-];
 const BUDGETS = [
-  { cat:"Comida",          limit:500, color:"#f4845f" },
-  { cat:"Transporte",      limit:200, color:"#4cc9f0" },
-  { cat:"Entretenimiento", limit:150, color:"#7c3aed" },
-  { cat:"Servicios",       limit:300, color:"#ffd166" },
+{cat:“Comida”,limit:500},{cat:“Transporte”,limit:200},
+{cat:“Ocio”,limit:150},{cat:“Servicios”,limit:300}
 ];
 const SEED = [
-  { id:1,  name:"Salario",      cat:"Ingresos",        amount:3200,  date:"2026-03-01", type:"income"  },
-  { id:2,  name:"Supermercado", cat:"Comida",           amount:-120,  date:"2026-03-05", type:"expense" },
-  { id:3,  name:"Netflix",      cat:"Entretenimiento",  amount:-15,   date:"2026-03-06", type:"expense" },
-  { id:4,  name:"Bus mensual",  cat:"Transporte",       amount:-45,   date:"2026-03-07", type:"expense" },
-  { id:5,  name:"Restaurante",  cat:"Comida",           amount:-38,   date:"2026-03-10", type:"expense" },
-  { id:6,  name:"Freelance",    cat:"Ingresos",        amount:450,   date:"2026-03-12", type:"income"  },
-  { id:7,  name:"Farmacia",     cat:"Salud",            amount:-22,   date:"2026-03-14", type:"expense" },
-  { id:8,  name:"Ropa H&M",     cat:"Ropa",             amount:-65,   date:"2026-03-18", type:"expense" },
-  { id:9,  name:"Spotify",      cat:"Entretenimiento",  amount:-9.99, date:"2026-03-20", type:"expense" },
-  { id:10, name:"Electricidad", cat:"Servicios",        amount:-80,   date:"2026-03-22", type:"expense" },
+{id:1,name:“Salario”,    cat:“Otro”,      amount:2800,  date:“01 Mar”,type:“i”},
+{id:2,name:“Mercado”,    cat:“Comida”,    amount:-95,   date:“03 Mar”,type:“e”},
+{id:3,name:“Bus”,        cat:“Transporte”,amount:-30,   date:“05 Mar”,type:“e”},
+{id:4,name:“Freelance”,  cat:“Otro”,      amount:350,   date:“08 Mar”,type:“i”},
+{id:5,name:“Restaurante”,cat:“Comida”,    amount:-42,   date:“10 Mar”,type:“e”},
+{id:6,name:“Spotify”,    cat:“Ocio”,      amount:-9.99, date:“12 Mar”,type:“e”},
 ];
 
-const fmtAbs = n => "$" + Math.abs(n).toLocaleString("es-EC",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmt    = n => (n<0?"-":"+")+fmtAbs(n);
-const catOf  = (cat, f) => CATEGORIES.find(c=>c.name===cat)?.[f] ?? (f==="icon"?"📦":"#6b6b80");
+const fmt = n => “$”+Math.abs(n).toLocaleString(“es-EC”,{minimumFractionDigits:2,maximumFractionDigits:2});
+const catColor = c => CATS[c] ?? “#7f8c8d”;
+const isConfigured = url => !url.includes(“TU_”);
 
-const isConfigured = (url) => !url.includes("TU_");
+// ── localStorage ──────────────────────────────────────────────────
+const save = (key, val) => {
+try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+};
+const load = (key, def) => {
+try {
+const v = localStorage.getItem(key);
+return v !== null ? JSON.parse(v) : def;
+} catch(e) { return def; }
+};
 
-// ── LEMON SQUEEZY CHECKOUT MODAL ─────────────────────────────────────────────
-function LSModal({ onClose, onSuccess }) {
-  const [billing, setBilling] = useState("monthly");
-  const [plan,    setPlan]    = useState("premium");
-  const [step,    setStep]    = useState("plans"); // plans | checkout | waiting | success
+// ── MODAL ─────────────────────────────────────────────────────────
+function UpgradeModal({ onClose, onSuccess }) {
+const [billing, setBilling] = useState(“monthly”);
+const [plan,    setPlan]    = useState(“pro”);
+const [step,    setStep]    = useState(“pick”);
 
-  const cfg = LS_CONFIG[billing];
-  const configured = isConfigured(cfg.checkoutUrl);
+const price  = billing === “annual” ? 7.99 : 9.99;
+const total  = billing === “annual” ? (price * 12).toFixed(2) : price.toFixed(2);
+const period = billing === “annual” ? “/año” : “/mes”;
+const url    = billing === “annual” ? LS_ANNUAL : LS_MONTHLY;
+const ok     = isConfigured(url);
 
-  // When returning from LS checkout (URL has ?success=true or similar),
-  // detect it via postMessage or URL param. Here we simulate via button.
-  useEffect(() => {
-    const handler = (e) => {
-      // Lemon Squeezy emits this event after successful payment in overlay mode
-      if (e.data?.event === "Lemon Squeezy checkout.success") {
-        setStep("success");
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, []);
+const openCheckout = () => {
+if (!ok) return;
+window.open(url + “?embed=1”, “_blank”, “width=500,height=700”);
+setStep(“waiting”);
+};
 
-  const handleOpenCheckout = () => {
-    if (!configured) return;
-    // Append embed params for overlay checkout
-    const url = cfg.checkoutUrl +
-      "?embed=1" +
-      "&media=0" +
-      "&logo=1" +
-      "&checkout[custom][user_id]=demo_user";
-    // Open Lemon Squeezy overlay
-    window.LemonSqueezy?.Url?.Open(url);
-    // Fallback: open in new tab if LS SDK not loaded
-    if (!window.LemonSqueezy) {
-      window.open(url, "_blank", "width=480,height=700");
-    }
-    setStep("waiting");
-  };
+return (
+<div className=“overlay” onClick={() => step !== “waiting” && onClose()}>
+<div className=“modal” onClick={e => e.stopPropagation()}>
 
-  return (
-    <div className="modal-overlay" onClick={() => step !== "waiting" && onClose()}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
-
-        {/* ── PLANS ── */}
-        {step === "plans" && <>
-          <div style={{fontFamily:"DM Serif Display,serif", fontSize:"1.4rem", marginBottom:"0.4rem"}}>Elige tu plan</div>
-          <div style={{fontSize:"0.85rem", color:"var(--muted)", marginBottom:"1.5rem", lineHeight:1.6}}>Sin contratos · Cancela cuando quieras · Pago seguro vía Lemon Squeezy</div>
-
-          <div className="pricing-toggle">
-            <button className={billing==="monthly"?"active":""} onClick={()=>setBilling("monthly")}>Mensual</button>
-            <button className={billing==="annual" ?"active":""} onClick={()=>setBilling("annual")}>Anual — ahorra 20%</button>
-          </div>
-
-          <div className="plan-compare">
-            <div className={`plan-card ${plan==="free"?"sel-free":""}`} onClick={()=>setPlan("free")}>
-              <div className="plan-name-badge">Free</div>
-              <div className="plan-price-big">$0 <span className="per">/siempre</span></div>
-              <ul className="plan-feats">
-                <li><span style={{color:"var(--success)"}}>✓</span> Dashboard básico</li>
-                <li><span style={{color:"var(--success)"}}>✓</span> Movimientos ilimitados</li>
-                <li><span style={{color:"var(--success)"}}>✓</span> Presupuestos fijos</li>
-                <li><span style={{color:"var(--muted)"}}>✗ Reportes avanzados</span></li>
-                <li><span style={{color:"var(--muted)"}}>✗ Metas de ahorro</span></li>
-              </ul>
-            </div>
-            <div className={`plan-card ${plan==="premium"?"sel-premium":""}`} onClick={()=>setPlan("premium")}>
-              <div className="plan-name-badge">Premium ⭐</div>
-              <div className="plan-price-big" style={{color:"var(--gold)"}}>
-                {cfg.price} <span className="per">{cfg.period}</span>
-              </div>
-              {billing==="annual" && <div className="save-badge">Ahorras $23.88/año</div>}
-              <ul className="plan-feats">
-                <li><span style={{color:"var(--gold)"}}>✓</span> Todo lo de Free</li>
-                <li><span style={{color:"var(--gold)"}}>✓</span> Reportes avanzados</li>
-                <li><span style={{color:"var(--gold)"}}>✓</span> Metas de ahorro</li>
-                <li><span style={{color:"var(--gold)"}}>✓</span> Exportar PDF / Excel</li>
-                <li><span style={{color:"var(--gold)"}}>✓</span> Insights con IA</li>
-              </ul>
-            </div>
-          </div>
-
-          <div style={{display:"flex", gap:"0.75rem"}}>
-            <button className="btn btn-ghost" style={{flex:1, justifyContent:"center"}} onClick={onClose}>Cancelar</button>
-            {plan==="free"
-              ? <button className="btn btn-accent" style={{flex:1, justifyContent:"center"}} onClick={onClose}>Continuar gratis</button>
-              : <button className="btn btn-premium" style={{flex:1, justifyContent:"center"}} onClick={()=>setStep("checkout")}>Continuar →</button>
-            }
-          </div>
-        </>}
-
-        {/* ── CHECKOUT ── */}
-        {step === "checkout" && <>
-          <div style={{display:"flex", alignItems:"center", gap:"0.75rem", marginBottom:"1.25rem"}}>
-            <button className="btn btn-ghost" style={{padding:"0.4rem 0.75rem",fontSize:"0.8rem"}} onClick={()=>setStep("plans")}>← Volver</button>
-            <div style={{fontFamily:"DM Serif Display,serif", fontSize:"1.3rem"}}>Resumen de compra</div>
-          </div>
-
-          {/* Config warning si aún no pegaron las URLs */}
-          {!configured && (
-            <div className="ls-config-warning">
-              <strong>⚠️ Configura tus URLs de Lemon Squeezy</strong>
-              Edita el archivo y reemplaza las URLs en <code>LS_CONFIG</code> con las de tu cuenta.<br/>
-              <span style={{color:"var(--muted)",marginTop:"0.4rem",display:"block"}}>
-                Cómo: lemonsqueezy.com → Tu producto → Share → Checkout URL
-              </span>
-            </div>
-          )}
-
-          <div className="ls-block">
-            <div className="ls-header">
-              <div className="ls-title">fivvy. Premium</div>
-              <div className="ls-logo"><span className="ls-logo-icon">🍋</span> Lemon Squeezy</div>
-            </div>
-
-            <div className="order-row"><span className="ol">Plan</span><span>Premium {billing==="annual"?"Anual":"Mensual"}</span></div>
-            <div className="order-row"><span className="ol">Precio</span><span>{cfg.price}{cfg.period}</span></div>
-            {billing==="annual" && <div className="order-row"><span className="ol">Ahorro vs mensual</span><span style={{color:"var(--success)"}}>-$23.88</span></div>}
-            <hr className="order-divider" />
-            <div className="order-total"><span style={{color:"var(--muted)"}}>Total hoy</span><span style={{color:"var(--accent)"}}>{cfg.price} USD</span></div>
-          </div>
-
-          <div style={{marginBottom:"1rem"}}>
-            <div style={{fontSize:"0.72rem",color:"var(--muted)",fontFamily:"DM Mono,monospace",marginBottom:"0.6rem",textTransform:"uppercase",letterSpacing:"0.8px"}}>Métodos de pago aceptados</div>
-            <div className="ls-methods">
-              {["💳 Tarjeta Visa","💳 Mastercard","💳 Amex","🍎 Apple Pay","🔵 PayPal"].map(m=>(
-                <div key={m} className="ls-method">{m}</div>
-              ))}
-            </div>
-          </div>
-
-          <button
-            className="btn-ls"
-            onClick={handleOpenCheckout}
-            disabled={!configured}
-            style={!configured?{opacity:0.5,cursor:"not-allowed"}:{}}
-          >
-            🍋 Pagar con Lemon Squeezy
-          </button>
-          <div className="ls-note">
-            Serás redirigido al checkout seguro de Lemon Squeezy.<br/>
-            🔒 Pagos cifrados · Cancela en cualquier momento desde tu cuenta
-          </div>
-
-          {/* Demo button for testing without real LS account */}
-          <div style={{textAlign:"center",marginTop:"1rem"}}>
-            <button className="btn btn-ghost" style={{fontSize:"0.75rem",margin:"0 auto",opacity:0.6}} onClick={()=>setStep("success")}>
-              [Demo] Simular pago exitoso →
-            </button>
-          </div>
-        </>}
-
-        {/* ── WAITING ── */}
-        {step === "waiting" && (
-          <div className="waiting-block">
-            <div className="ls-spinner" />
-            <div style={{fontFamily:"DM Serif Display,serif",fontSize:"1.3rem",marginBottom:"0.5rem"}}>Esperando confirmación...</div>
-            <div style={{fontSize:"0.82rem",color:"var(--muted)",marginBottom:"1.5rem",lineHeight:1.6}}>
-              Completa el pago en la ventana de Lemon Squeezy.<br/>Esta pantalla se actualizará automáticamente.
-            </div>
-            <button className="btn btn-ghost" style={{margin:"0 auto",fontSize:"0.8rem"}} onClick={()=>setStep("success")}>
-              Ya pagué — Activar Premium ✓
-            </button>
-          </div>
-        )}
-
-        {/* ── SUCCESS ── */}
-        {step === "success" && (
-          <div style={{textAlign:"center"}}>
-            <span className="success-icon">🎉</span>
-            <div style={{fontFamily:"DM Serif Display,serif",fontSize:"1.6rem",marginBottom:"0.5rem"}}>¡Bienvenido a Premium!</div>
-            <div style={{fontSize:"0.85rem",color:"var(--muted)",marginBottom:"1.5rem",lineHeight:1.6}}>
-              Tu suscripción está activa. Recibirás un email de confirmación de Lemon Squeezy con tu recibo y datos de facturación.
-            </div>
-            <div style={{background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:"12px",padding:"1rem",marginBottom:"1.5rem",fontSize:"0.8rem",color:"var(--muted)",lineHeight:1.6}}>
-              💡 Para gestionar tu suscripción (cancelar, actualizar tarjeta) visita el link en el email de confirmación.
-            </div>
-            <button className="btn btn-premium" style={{margin:"0 auto"}} onClick={onSuccess}>
-              Ir a mis reportes →
-            </button>
-          </div>
-        )}
+```
+    {step === "pick" && <>
+      <div style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.45rem",marginBottom:".3rem"}}>Hazte Pro</div>
+      <div style={{fontSize:".82rem",color:"var(--muted)",marginBottom:"1.25rem",lineHeight:1.5}}>Sin contratos · cancela cuando quieras</div>
+      <div className="btoggle">
+        <button className={billing==="monthly"?"on":""} onClick={()=>setBilling("monthly")}>Mensual</button>
+        <button className={billing==="annual" ?"on":""} onClick={()=>setBilling("annual")}>Anual — 20% off</button>
       </div>
-    </div>
-  );
+      <div className="plans">
+        <div className={`plan ${plan==="free"?"sel":""}`} onClick={()=>setPlan("free")}>
+          <div className="plan-name">Free</div>
+          <div className="plan-price">$0<span>/siempre</span></div>
+          <ul className="plan-feats">
+            <li className="y">Dashboard</li>
+            <li className="y">Movimientos</li>
+            <li className="y">Presupuestos</li>
+            <li className="n">Reportes</li>
+            <li className="n">Metas</li>
+          </ul>
+        </div>
+        <div className={`plan ${plan==="pro"?"sel":""}`} onClick={()=>setPlan("pro")}>
+          <div className="plan-name">Pro ★</div>
+          <div className="plan-price" style={{color:"var(--gold)"}}>
+            ${price.toFixed(2)}<span>{period}</span>
+          </div>
+          {billing==="annual" && <div className="plan-save">Ahorras $23.88/año</div>}
+          <ul className="plan-feats">
+            <li className="y">Todo Free</li>
+            <li className="y">Reportes</li>
+            <li className="y">Metas ahorro</li>
+            <li className="y">Exportar datos</li>
+          </ul>
+        </div>
+      </div>
+      {plan === "free"
+        ? <button className="btn-main" onClick={onClose}>Continuar gratis</button>
+        : <button className="btn-main" onClick={()=>setStep("confirm")}>Continuar →</button>
+      }
+      <button className="btn-ghost" onClick={onClose}>Cancelar</button>
+    </>}
+
+    {step === "confirm" && <>
+      <div style={{display:"flex",alignItems:"center",marginBottom:"1.25rem"}}>
+        <button className="back-btn" onClick={()=>setStep("pick")}>← Volver</button>
+        <div style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.3rem"}}>Confirmar pago</div>
+      </div>
+      {!ok && (
+        <div style={{background:"#fff8e1",border:"1px solid #ffe082",borderRadius:"3px",padding:".7rem .9rem",marginBottom:".85rem",fontSize:".76rem",lineHeight:1.5}}>
+          <strong style={{display:"block",marginBottom:".15rem",color:"#b8860b"}}>⚠️ Configura Lemon Squeezy</strong>
+          Reemplaza <code style={{fontFamily:"monospace",background:"rgba(0,0,0,.06)",padding:".1rem .3rem",borderRadius:"2px"}}>LS_MONTHLY</code> y <code style={{fontFamily:"monospace",background:"rgba(0,0,0,.06)",padding:".1rem .3rem",borderRadius:"2px"}}>LS_ANNUAL</code> con tus URLs reales.
+        </div>
+      )}
+      <div className="order">
+        <div className="order-row"><span className="ol">Plan</span><span>Pro {billing==="annual"?"Anual":"Mensual"}</span></div>
+        <div className="order-row"><span className="ol">Precio</span><span>${price.toFixed(2)}{period}</span></div>
+        {billing==="annual" && <div className="order-row"><span className="ol">Descuento</span><span style={{color:"var(--green)"}}>-$23.88</span></div>}
+        <hr className="order-div"/>
+        <div className="order-total"><span>Total hoy</span><span>${total} USD</span></div>
+      </div>
+      <div className="methods">
+        {["💳 Visa","💳 Mastercard","🍎 Apple Pay","🔵 PayPal"].map(m=>(
+          <span key={m} className="method">{m}</span>
+        ))}
+      </div>
+      <button className="btn-main" onClick={openCheckout} disabled={!ok}>
+        🍋 Pagar con Lemon Squeezy
+      </button>
+      <button className="btn-demo" onClick={()=>setStep("success")}>[demo] simular pago exitoso</button>
+    </>}
+
+    {step === "waiting" && (
+      <div style={{textAlign:"center",padding:"1.5rem 0"}}>
+        <div className="spin"/>
+        <div style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.3rem",marginBottom:".5rem"}}>Esperando pago...</div>
+        <div style={{fontSize:".82rem",color:"var(--muted)",marginBottom:"1.5rem",lineHeight:1.6}}>
+          Completa el pago en la ventana de Lemon Squeezy.
+        </div>
+        <button className="btn-main" style={{maxWidth:"240px",margin:"0 auto"}} onClick={()=>setStep("success")}>
+          Ya pagué — Activar Pro ✓
+        </button>
+      </div>
+    )}
+
+    {step === "success" && (
+      <div style={{textAlign:"center"}}>
+        <span className="check-icon">✓</span>
+        <div style={{fontFamily:"'Instrument Serif',serif",fontSize:"1.5rem",marginBottom:".5rem"}}>¡Bienvenido a Pro!</div>
+        <div style={{fontSize:".85rem",color:"var(--muted)",marginBottom:"1.5rem",lineHeight:1.6}}>
+          Tu suscripción está activa. Recibirás un email de Lemon Squeezy.
+        </div>
+        <button className="btn-main" style={{maxWidth:"200px",margin:"0 auto"}} onClick={onSuccess}>
+          Continuar →
+        </button>
+      </div>
+    )}
+  </div>
+</div>
+```
+
+);
 }
 
-// ── MAIN APP ──────────────────────────────────────────────────────────────────
+// ── MAIN APP ──────────────────────────────────────────────────────
 export default function App() {
-  const [tab,       setTab]       = useState("dashboard");
-  const [isPremium, setIsPremium] = useState(false);
-  const [txs,       setTxs]       = useState(SEED);
-  const [form,      setForm]      = useState({name:"",amount:"",cat:"Comida",type:"expense"});
-  const [showPay,   setShowPay]   = useState(false);
-  const [nextId,    setNextId]    = useState(11);
+// Estado con localStorage desde el inicio
+const [tab,    setTab]    = useState(“dashboard”);
+const [isPro,  setIsPro]  = useState(() => load(“fivvy_pro”, false));
+const [txs,    setTxs]    = useState(() => load(“fivvy_txs”, SEED));
+const [nextId, setNextId] = useState(() => load(“fivvy_nextid”, 7));
+const [modal,  setModal]  = useState(false);
+const [form,   setForm]   = useState({name:””,amount:””,cat:“Comida”,type:“e”});
 
-  // Load Lemon Squeezy JS embed (needed for overlay checkout)
-  useEffect(() => {
-    if (document.getElementById("ls-sdk")) return;
-    const s = document.createElement("script");
-    s.id  = "ls-sdk";
-    s.src = "https://app.lemonsqueezy.com/js/lemon.js";
-    s.defer = true;
-    document.body.appendChild(s);
-  }, []);
+// Guardar automáticamente cada vez que cambia algo
+useEffect(() => { save(“fivvy_txs”,    txs);    }, [txs]);
+useEffect(() => { save(“fivvy_pro”,    isPro);  }, [isPro]);
+useEffect(() => { save(“fivvy_nextid”, nextId); }, [nextId]);
 
-  const income   = txs.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
-  const expenses = txs.filter(t=>t.type==="expense").reduce((s,t)=>s+Math.abs(t.amount),0);
-  const balance  = income - expenses;
-  const savRate  = income>0?((balance/income)*100).toFixed(0):0;
+const income   = txs.filter(t=>t.type===“i”).reduce((s,t)=>s+t.amount,0);
+const expenses = txs.filter(t=>t.type===“e”).reduce((s,t)=>s+Math.abs(t.amount),0);
+const balance  = income - expenses;
 
-  const addTx = () => {
-    if (!form.name||!form.amount) return;
-    const amount = form.type==="expense"?-Math.abs(parseFloat(form.amount)):Math.abs(parseFloat(form.amount));
-    const today  = new Date().toISOString().split("T")[0];
-    setTxs(p=>[{id:nextId,name:form.name,cat:form.cat,amount,date:today,type:form.type},...p]);
-    setNextId(n=>n+1);
-    setForm({name:"",amount:"",cat:"Comida",type:"expense"});
-  };
+const addTx = () => {
+if (!form.name.trim() || !form.amount) return;
+const amount = form.type===“e”
+? -Math.abs(parseFloat(form.amount))
+:  Math.abs(parseFloat(form.amount));
+const today = new Date().toLocaleDateString(“es-EC”,{day:“2-digit”,month:“short”});
+setTxs(p => [{id:nextId, name:form.name, cat:form.cat, amount, date:today, type:form.type}, …p]);
+setNextId(n => n + 1);
+setForm(f => ({…f, name:””, amount:””}));
+};
 
-  const chartData = [
-    {m:"Oct",v:380},{m:"Nov",v:450},{m:"Dic",v:620},{m:"Ene",v:390},{m:"Feb",v:410},{m:"Mar",v:expenses}
-  ];
-  const maxV = Math.max(...chartData.map(d=>d.v));
+const delTx = id => setTxs(p => p.filter(t => t.id !== id));
 
-  const budgetProgress = BUDGETS.map(b=>({
-    ...b,
-    spent: txs.filter(t=>t.cat===b.cat&&t.type==="expense").reduce((s,t)=>s+Math.abs(t.amount),0)
-  }));
+const budgets = BUDGETS.map(b => ({
+…b,
+spent: txs.filter(t=>t.cat===b.cat&&t.type===“e”).reduce((s,t)=>s+Math.abs(t.amount),0)
+}));
 
-  const TABS = [
-    {id:"dashboard",   label:"Dashboard",   premium:false},
-    {id:"transactions",label:"Movimientos", premium:false},
-    {id:"budget",      label:"Presupuesto", premium:false},
-    {id:"reports",     label:"Reportes",    premium:true },
-    {id:"goals",       label:"Metas",       premium:true },
-  ];
+const TxRow = ({t, showDel}) => (
+<div className="tx">
+<div className="dot" style={{background:catColor(t.cat)}}/>
+<div className="tx-body">
+<div className="tx-name">{t.name}</div>
+<div className="tx-meta">{t.cat} · {t.date}</div>
+</div>
+<div className=“tx-amt” style={{color:t.type===“i”?“var(–green)”:“var(–red)”}}>
+{t.type===“i”?”+”:”-”}{fmt(t.amount)}
+</div>
+{showDel && <button className=“del-btn” onClick={()=>delTx(t.id)}>✕</button>}
+</div>
+);
 
-  const Locked = ({icon,title,desc,features}) => (
-    <div className="locked-section">
-      <div className="locked-icon">{icon}</div>
-      <div className="locked-title">{title}</div>
-      <div className="locked-desc">{desc}</div>
-      <ul className="features-list">{features.map(f=><li key={f}>{f}</li>)}</ul>
-      <button className="btn btn-premium" onClick={()=>setShowPay(true)}>⭐ Activar Premium — desde $9.99/mes</button>
-    </div>
-  );
+const AddForm = () => (
+<div className="form-card">
+<div className="form-lbl">Agregar movimiento</div>
+<div className="row1">
+<input className=“inp” placeholder=“Descripción”
+value={form.name}
+onChange={e=>setForm(f=>({…f,name:e.target.value}))}
+onKeyDown={e=>e.key===“Enter”&&addTx()}/>
+<input className=“inp” type=“number” placeholder=“0.00”
+value={form.amount}
+onChange={e=>setForm(f=>({…f,amount:e.target.value}))}
+onKeyDown={e=>e.key===“Enter”&&addTx()}/>
+</div>
+<div className="row2">
+<select className=“inp” value={form.cat} onChange={e=>setForm(f=>({…f,cat:e.target.value}))}>
+{Object.keys(CATS).map(c=><option key={c}>{c}</option>)}
+</select>
+<div className="seg">
+<button className={form.type===“e”?“exp”:””} onClick={()=>setForm(f=>({…f,type:“e”}))}>Gasto</button>
+<button className={form.type===“i”?“inc”:””} onClick={()=>setForm(f=>({…f,type:“i”}))}>Ingreso</button>
+</div>
+<button className="add-btn" onClick={addTx}>+ Add</button>
+</div>
+</div>
+);
 
-  return (
-    <>
-      <style>{style}</style>
-      <div className="app">
+return (
+<>
+<style>{CSS}</style>
+<div className="wrap">
 
-        <nav className="nav">
-          <div className="logo">fivvy<span>.</span></div>
-          <div className="nav-right">
-            <span className={`plan-badge ${isPremium?"premium":""}`}>{isPremium?"⭐ Premium":"Free"}</span>
-            {!isPremium && <button className="btn btn-premium" onClick={()=>setShowPay(true)}>Mejorar plan</button>}
-          </div>
-        </nav>
-
-        <div className="tabs">
-          {TABS.map(t=>(
-            <button key={t.id} className={`tab ${tab===t.id?"active":""}`}
-              onClick={()=>{ if(t.premium&&!isPremium){setShowPay(true);}else{setTab(t.id);} }}>
-              {t.label}{t.premium&&!isPremium&&<span style={{fontSize:"0.65rem"}}>🔒</span>}
-            </button>
-          ))}
-        </div>
-
-        <main className="main">
-
-          {/* DASHBOARD */}
-          {tab==="dashboard" && <>
-            <div className="kpi-grid">
-              {[
-                {label:"Balance Total", value:fmtAbs(balance), sub:"Este mes",                                cls:balance>=0?"kpi-positive":"kpi-negative",glow:"#00e5a0"},
-                {label:"Ingresos",      value:fmtAbs(income),  sub:`${txs.filter(t=>t.type==="income").length} transacciones`,  cls:"kpi-positive",glow:"#00e5a0"},
-                {label:"Gastos",        value:fmtAbs(expenses),sub:`${txs.filter(t=>t.type==="expense").length} transacciones`, cls:"kpi-negative",glow:"#ff4d6d"},
-                {label:"Tasa ahorro",   value:`${savRate}%`,   sub:savRate>=20?"🟢 Saludable":"🔴 Mejorar",  cls:"kpi-accent",  glow:"#c8ff00"},
-              ].map((k,i)=>(
-                <div key={i} className="kpi">
-                  <div className="kpi-glow" style={{background:k.glow}}/>
-                  <div className="kpi-label">{k.label}</div>
-                  <div className={`kpi-value ${k.cls}`}>{k.value}</div>
-                  <div className="kpi-sub">{k.sub}</div>
-                </div>
-              ))}
-            </div>
-
-            {expenses>income*0.8 && <div className="alert">⚠️ Tus gastos superan el 80% de tus ingresos este mes.</div>}
-
-            <div className="chart-wrap">
-              <div className="section-title" style={{marginBottom:"1.25rem"}}>Gastos mensuales <span className="muted">Últimos 6 meses</span></div>
-              <div className="bar-chart">
-                {chartData.map((d,i)=>(
-                  <div key={i} className="bar-col">
-                    <div className="bar" style={{height:`${(d.v/maxV)*100}%`,background:i===chartData.length-1?"var(--accent)":"var(--surface2)",border:i===chartData.length-1?"none":"1px solid var(--border)"}}/>
-                    <div className="bar-label">{d.m}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="section-title">Últimos movimientos</div>
-            <div className="tx-list">
-              {txs.slice(0,5).map(t=>(
-                <div key={t.id} className="tx">
-                  <div className="tx-icon" style={{background:catOf(t.cat,"color")+"22"}}>{catOf(t.cat,"icon")}</div>
-                  <div className="tx-info"><div className="tx-name">{t.name}</div><div className="tx-cat">{t.cat}</div></div>
-                  <div>
-                    <div className="tx-amount" style={{color:t.type==="income"?"var(--success)":"var(--danger)"}}>{fmt(t.amount)}</div>
-                    <div className="tx-date">{t.date}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>}
-
-          {/* TRANSACTIONS */}
-          {tab==="transactions" && <>
-            <div className="add-form">
-              <div className="section-title" style={{marginBottom:"1rem"}}>Agregar movimiento</div>
-              <div className="form-grid">
-                <div className="field"><label>Descripción</label><input placeholder="Ej: Supermercado" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></div>
-                <div className="field"><label>Monto ($)</label><input type="number" placeholder="0.00" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))}/></div>
-                <div className="field"><label>Categoría</label><select value={form.cat} onChange={e=>setForm(f=>({...f,cat:e.target.value}))}>{CATEGORIES.map(c=><option key={c.name}>{c.name}</option>)}</select></div>
-                <div className="field"><label>Tipo</label><select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))}><option value="expense">Gasto</option><option value="income">Ingreso</option></select></div>
-                <div style={{display:"flex",alignItems:"flex-end"}}><button className="btn btn-accent" onClick={addTx}>+ Agregar</button></div>
-              </div>
-            </div>
-            <div className="section-title">Todos los movimientos <span className="muted">{txs.length} total</span></div>
-            <div className="tx-list">
-              {txs.map(t=>(
-                <div key={t.id} className="tx">
-                  <div className="tx-icon" style={{background:catOf(t.cat,"color")+"22"}}>{catOf(t.cat,"icon")}</div>
-                  <div className="tx-info"><div className="tx-name">{t.name}</div><div className="tx-cat">{t.cat} · {t.date}</div></div>
-                  <div style={{display:"flex",gap:"0.75rem",alignItems:"center"}}>
-                    <div className="tx-amount" style={{color:t.type==="income"?"var(--success)":"var(--danger)"}}>{fmt(t.amount)}</div>
-                    <button className="btn btn-danger" onClick={()=>setTxs(p=>p.filter(x=>x.id!==t.id))}>✕</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>}
-
-          {/* BUDGET */}
-          {tab==="budget" && <>
-            <div className="section-title" style={{marginBottom:"1.25rem"}}>Presupuesto mensual <span className="muted">Marzo 2026</span></div>
-            <div className="budget-grid">
-              {budgetProgress.map(b=>{
-                const pct=Math.min((b.spent/b.limit)*100,100);
-                const color=pct>90?"var(--danger)":pct>70?"var(--gold)":b.color;
-                return(
-                  <div key={b.cat} className="budget-card">
-                    <div className="budget-header">
-                      <div><div style={{fontSize:"1.1rem",marginBottom:"0.2rem"}}>{catOf(b.cat,"icon")}</div><div className="budget-cat">{b.cat}</div></div>
-                      <div className="budget-amounts">{fmtAbs(b.spent)} / {fmtAbs(b.limit)}</div>
-                    </div>
-                    <div className="progress-track"><div className="progress-fill" style={{width:`${pct}%`,background:color}}/></div>
-                    <div className="budget-pct" style={{color}}>{pct.toFixed(0)}% usado{pct>90?" · ⚠️":""}</div>
-                  </div>
-                );
-              })}
-            </div>
-            {!isPremium&&<div style={{marginTop:"1.5rem"}}><Locked icon="📊" title="Presupuestos personalizados" desc="Crea y edita tus propias categorías." features={["Categorías a medida","Alertas inteligentes","Límites dinámicos"]}/></div>}
-          </>}
-
-          {/* REPORTS */}
-          {tab==="reports"&&!isPremium&&<Locked icon="📈" title="Reportes avanzados" desc="Tendencias, comparativas y exportación de datos." features={["Gráficas por categoría","Comparativa mes a mes","Exportar PDF y Excel","Insights con IA"]}/>}
-          {tab==="reports"&&isPremium&&<>
-            <div className="section-title" style={{marginBottom:"1.25rem"}}>Reportes avanzados</div>
-            <div className="kpi-grid">
-              {CATEGORIES.filter(c=>c.name!=="Ingresos").map(c=>{
-                const total=txs.filter(t=>t.cat===c.name&&t.type==="expense").reduce((s,t)=>s+Math.abs(t.amount),0);
-                return total>0?(
-                  <div key={c.name} className="kpi">
-                    <div className="kpi-glow" style={{background:c.color}}/>
-                    <div className="kpi-label">{c.icon} {c.name}</div>
-                    <div className="kpi-value" style={{color:c.color}}>{fmtAbs(total)}</div>
-                    <div className="kpi-sub">{((total/expenses)*100).toFixed(1)}% del total</div>
-                  </div>
-                ):null;
-              })}
-            </div>
-            <div className="chart-wrap" style={{marginTop:"1.5rem"}}>
-              <div className="section-title" style={{marginBottom:"1rem"}}>Distribución por categoría</div>
-              <div className="bar-chart" style={{height:"160px"}}>
-                {CATEGORIES.filter(c=>c.name!=="Ingresos").map(c=>{
-                  const total=txs.filter(t=>t.cat===c.name&&t.type==="expense").reduce((s,t)=>s+Math.abs(t.amount),0);
-                  return total>0?(
-                    <div key={c.name} className="bar-col">
-                      <div className="bar" style={{height:`${(total/expenses)*100}%`,background:c.color}}/>
-                      <div className="bar-label">{c.icon}</div>
-                      <div className="bar-label">{c.name.slice(0,4)}</div>
-                    </div>
-                  ):null;
-                })}
-              </div>
-            </div>
-          </>}
-
-          {/* GOALS */}
-          {tab==="goals"&&!isPremium&&<Locked icon="🎯" title="Metas de ahorro" desc="Define objetivos y rastrea tu progreso." features={["Metas con fecha límite","Progreso visual","Proyecciones de ahorro","Alertas de desvío"]}/>}
-          {tab==="goals"&&isPremium&&<>
-            <div className="section-title" style={{marginBottom:"1.25rem"}}>Metas de ahorro</div>
-            {[
-              {name:"Fondo de emergencia",target:5000,saved:1200,icon:"🛡️",color:"#4cc9f0"},
-              {name:"Vacaciones 2026",    target:2000,saved:650, icon:"✈️",color:"#f4845f"},
-              {name:"Laptop nueva",       target:1500,saved:900, icon:"💻",color:"#c8ff00"},
-            ].map(g=>{
-              const pct=Math.min((g.saved/g.target)*100,100);
-              return(
-                <div key={g.name} className="budget-card" style={{marginBottom:"1rem"}}>
-                  <div className="budget-header">
-                    <div><div style={{fontSize:"1.3rem",marginBottom:"0.3rem"}}>{g.icon}</div><div className="budget-cat">{g.name}</div></div>
-                    <div>
-                      <div className="budget-amounts">{fmtAbs(g.saved)} / {fmtAbs(g.target)}</div>
-                      <div style={{fontSize:"0.7rem",color:"var(--muted)",textAlign:"right",fontFamily:"DM Mono",marginTop:"0.2rem"}}>{pct<100?`Faltan ${fmtAbs(g.target-g.saved)}`:"✅ Completada"}</div>
-                    </div>
-                  </div>
-                  <div className="progress-track"><div className="progress-fill" style={{width:`${pct}%`,background:g.color}}/></div>
-                  <div className="budget-pct" style={{color:g.color}}>{pct.toFixed(0)}% alcanzado</div>
-                </div>
-              );
-            })}
-          </>}
-
-        </main>
-
-        {showPay&&(
-          <LSModal
-            onClose={()=>setShowPay(false)}
-            onSuccess={()=>{ setIsPremium(true); setShowPay(false); setTab("reports"); }}
-          />
-        )}
+```
+    {/* HEADER */}
+    <header className="header">
+      <div className="logo">fivvy<em>.</em></div>
+      <div style={{display:"flex",gap:".6rem",alignItems:"center"}}>
+        <span className={`badge ${isPro?"pro":""}`}>{isPro?"Pro ★":"Free"}</span>
+        {!isPro && <button className="btn-upgrade" onClick={()=>setModal(true)}>Mejorar</button>}
       </div>
-    </>
-  );
+    </header>
+
+    {/* NAV */}
+    <nav className="nav">
+      {[
+        {id:"dashboard", label:"Inicio"},
+        {id:"movements", label:"Movimientos"},
+        {id:"budget",    label:"Presupuesto"},
+      ].map(t=>(
+        <button key={t.id} className={`nav-btn ${tab===t.id?"on":""}`} onClick={()=>setTab(t.id)}>
+          {t.label}
+        </button>
+      ))}
+    </nav>
+
+    {/* ── DASHBOARD ── */}
+    {tab==="dashboard" && <>
+      <div className="hero">
+        <div className="hero-label">Balance del mes</div>
+        <div className={`hero-amt ${balance>=0?"pos":"neg"}`}>{fmt(balance)}</div>
+        <div className="hero-sub">
+          <div>
+            <div className="stat-label">Ingresos</div>
+            <div className="stat-val pos">{fmt(income)}</div>
+          </div>
+          <div>
+            <div className="stat-label">Gastos</div>
+            <div className="stat-val neg">{fmt(expenses)}</div>
+          </div>
+          <div>
+            <div className="stat-label">Ahorro</div>
+            <div className="stat-val" style={{color:"var(--gold)"}}>
+              {income>0?Math.round((balance/income)*100):0}%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <AddForm/>
+
+      <div className="sec-lbl">Recientes</div>
+      <div className="tx-list">
+        {txs.length===0
+          ? <div className="empty">sin movimientos aún</div>
+          : txs.slice(0,5).map(t=><TxRow key={t.id} t={t} showDel={false}/>)
+        }
+      </div>
+    </>}
+
+    {/* ── MOVIMIENTOS ── */}
+    {tab==="movements" && <>
+      <AddForm/>
+      <div className="sec-lbl">{txs.length} registros</div>
+      <div className="tx-list">
+        {txs.length===0
+          ? <div className="empty">sin movimientos aún</div>
+          : txs.map(t=><TxRow key={t.id} t={t} showDel={true}/>)
+        }
+      </div>
+    </>}
+
+    {/* ── PRESUPUESTO ── */}
+    {tab==="budget" && <>
+      <div className="sec-lbl">Presupuesto · este mes</div>
+      <div className="bud-list">
+        {budgets.map(b=>{
+          const pct   = Math.min((b.spent/b.limit)*100,100);
+          const color = pct>90?"var(--red)":pct>70?"var(--gold)":catColor(b.cat);
+          return (
+            <div key={b.cat} className="bud">
+              <div className="bud-head">
+                <div className="bud-cat">{b.cat}</div>
+                <div className="bud-nums">{fmt(b.spent)} / {fmt(b.limit)}</div>
+              </div>
+              <div className="track">
+                <div className="fill" style={{width:`${pct}%`,background:color}}/>
+              </div>
+              <div className="bud-pct" style={{color}}>
+                {pct.toFixed(0)}%{pct>90?" · límite alcanzado":""}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {!isPro && (
+        <div className="paywall">
+          <h2>Presupuestos personalizados</h2>
+          <p>Crea tus propias categorías y ajusta tus límites.</p>
+          <ul>
+            <li>Categorías a medida</li>
+            <li>Alertas por email</li>
+            <li>Historial mensual</li>
+          </ul>
+          <button className="btn-pay" onClick={()=>setModal(true)}>Ver planes →</button>
+        </div>
+      )}
+    </>}
+
+  </div>
+
+  {modal && (
+    <UpgradeModal
+      onClose={()=>setModal(false)}
+      onSuccess={()=>{ setIsPro(true); setModal(false); }}
+    />
+  )}
+</>
+```
+
+);
 }
