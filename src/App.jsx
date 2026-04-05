@@ -158,7 +158,7 @@ function UpgradeModal({ onClose, onSuccess }) {
   const [plan,    setPlan]    = useState("pro");
   const [step,    setStep]    = useState("pick");
 
-  const price  = billing === "annual" ? 7.99 : 9.99;
+  const price  = billing === "annual" ? 79.99 : 9.99;
   const total  = billing === "annual" ? (price * 12).toFixed(2) : price.toFixed(2);
   const period = billing === "annual" ? "/año" : "/mes";
   const url    = billing === "annual" ? LS_ANNUAL : LS_MONTHLY;
