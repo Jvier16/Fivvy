@@ -38,8 +38,6 @@ body{background:var(--paper);color:var(--ink);font-family:var(--font);min-height
 .stat-val{font-family:var(--font);font-weight:600;font-size:1.35rem;letter-spacing:-.5px}
 .form-card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1.25rem;margin-bottom:2rem}
 .form-lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
-.row1{display:grid;grid-template-columns:1fr 100px;gap:.6rem;margin-bottom:.6rem}
-.row2{display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem}
 .inp{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:.6rem .75rem;font-family:var(--font);font-size:.875rem;color:var(--ink);outline:none;transition:border-color .15s}
 .inp:focus{border-color:var(--ink)}
 .inp::placeholder{color:var(--muted)}
@@ -48,7 +46,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--font);min-height
 .seg button{flex:1;padding:.6rem;border:none;background:none;font-family:var(--font);font-size:.8rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
 .seg button.exp{background:var(--red);color:#fff}
 .seg button.inc{background:var(--green);color:#fff}
-.add-btn{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.6rem 1.1rem;font-family:var(--font);font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.add-btn{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.6rem 1.1rem;font-family:var(--font);font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap;width:100%;margin-top:.6rem}
 .sec-lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
 .tx-list{display:flex;flex-direction:column}
 .tx{display:flex;align-items:center;gap:.9rem;padding:.9rem 0;border-bottom:1px solid var(--line)}
@@ -113,9 +111,6 @@ body{background:var(--paper);color:var(--ink);font-family:var(--font);min-height
 @keyframes rot{to{transform:rotate(360deg)}}
 @keyframes po{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:480px){
-  .row1{grid-template-columns:1fr}
-  .row2{grid-template-columns:1fr 1fr}
-  .add-btn{grid-column:1/-1}
   .plans{grid-template-columns:1fr}
   .hero-sub{gap:1.5rem}
 }
@@ -141,48 +136,52 @@ const SEED = [
 const fmt = n => "$" + Math.abs(n).toLocaleString("es-EC",{minimumFractionDigits:2,maximumFractionDigits:2});
 const catColor = c => CATS[c] ?? "#7f8c8d";
 const isConfigured = url => !url.includes("TU_");
+const todayISO = () => new Date().toISOString().split("T")[0];
+const fmtDate = iso => new Date(iso + "T12:00:00").toLocaleDateString("es-EC",{day:"2-digit",month:"short"});
 
-// localStorage helpers
 const save = (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} };
 const load = (key, def)  => { try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; } };
 
-// ── ADD FORM — fuera del App para evitar el bug del teclado ───────
+// ── ADD FORM ──────────────────────────────────────────────────────
 function AddForm({ form, setForm, onAdd }) {
   return (
     <div className="form-card">
       <div className="form-lbl">Agregar movimiento</div>
-      <div className="row1">
-        <input
-          className="inp"
-          placeholder="Descripción"
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 100px",gap:".6rem",marginBottom:".6rem"}}>
+        <input className="inp" placeholder="Descripción"
           value={form.name}
           onChange={e => setForm(f => ({...f, name: e.target.value}))}
           onKeyDown={e => e.key === "Enter" && onAdd()}
         />
-        <input
-          className="inp"
-          type="number"
-          placeholder="0.00"
+        <input className="inp" type="number" placeholder="0.00"
           value={form.amount}
           onChange={e => setForm(f => ({...f, amount: e.target.value}))}
           onKeyDown={e => e.key === "Enter" && onAdd()}
         />
       </div>
-      <div className="row2">
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".6rem",marginBottom:".6rem"}}>
         <select className="inp" value={form.cat} onChange={e => setForm(f => ({...f, cat: e.target.value}))}>
           {Object.keys(CATS).map(c => <option key={c}>{c}</option>)}
         </select>
-        <div className="seg">
-          <button className={form.type === "e" ? "exp" : ""} onClick={() => setForm(f => ({...f, type: "e"}))}>Gasto</button>
-          <button className={form.type === "i" ? "inc" : ""} onClick={() => setForm(f => ({...f, type: "i"}))}>Ingreso</button>
-        </div>
-        <button className="add-btn" onClick={onAdd}>+ Add</button>
+        <input className="inp" type="date"
+          value={form.date}
+          onChange={e => setForm(f => ({...f, date: e.target.value}))}
+        />
       </div>
+
+      <div className="seg" style={{marginBottom:".6rem"}}>
+        <button className={form.type === "e" ? "exp" : ""} onClick={() => setForm(f => ({...f, type: "e"}))}>Gasto</button>
+        <button className={form.type === "i" ? "inc" : ""} onClick={() => setForm(f => ({...f, type: "i"}))}>Ingreso</button>
+      </div>
+
+      <button className="add-btn" onClick={onAdd}>+ Agregar</button>
     </div>
   );
 }
 
-// ── TX ROW — fuera del App ────────────────────────────────────────
+// ── TX ROW ────────────────────────────────────────────────────────
 function TxRow({ t, showDel, onDel }) {
   return (
     <div className="tx">
@@ -199,7 +198,7 @@ function TxRow({ t, showDel, onDel }) {
   );
 }
 
-// ── UPGRADE MODAL — fuera del App ────────────────────────────────
+// ── UPGRADE MODAL ─────────────────────────────────────────────────
 function UpgradeModal({ onClose, onSuccess }) {
   const [billing, setBilling] = useState("monthly");
   const [plan,    setPlan]    = useState("pro");
@@ -222,7 +221,7 @@ function UpgradeModal({ onClose, onSuccess }) {
       <div className="modal" onClick={e => e.stopPropagation()}>
 
         {step === "pick" && <>
-          <div style={{fontFamily:"var(--font)",fontWeight:700,fontSize:"1.45rem",marginBottom:".3rem"}}>Hazte Pro</div>
+          <div style={{fontWeight:700,fontSize:"1.45rem",marginBottom:".3rem"}}>Hazte Pro</div>
           <div style={{fontSize:".82rem",color:"var(--muted)",marginBottom:"1.25rem",lineHeight:1.5}}>Sin contratos · cancela cuando quieras</div>
           <div className="btoggle">
             <button className={billing === "monthly" ? "on" : ""} onClick={() => setBilling("monthly")}>Mensual</button>
@@ -264,7 +263,7 @@ function UpgradeModal({ onClose, onSuccess }) {
         {step === "confirm" && <>
           <div style={{display:"flex",alignItems:"center",marginBottom:"1.25rem"}}>
             <button className="back-btn" onClick={() => setStep("pick")}>← Volver</button>
-            <div style={{fontFamily:"var(--font)",fontWeight:700,fontSize:"1.3rem"}}>Confirmar pago</div>
+            <div style={{fontWeight:700,fontSize:"1.3rem"}}>Confirmar pago</div>
           </div>
           {!ok && (
             <div style={{background:"#fff8e1",border:"1px solid #ffe082",borderRadius:"3px",padding:".7rem .9rem",marginBottom:".85rem",fontSize:".76rem",lineHeight:1.5}}>
@@ -327,7 +326,7 @@ export default function App() {
   const [txs,    setTxs]    = useState(() => load("fivvy_txs", SEED));
   const [nextId, setNextId] = useState(() => load("fivvy_nextid", 7));
   const [modal,  setModal]  = useState(false);
-  const [form,   setForm]   = useState({name:"", amount:"", cat:"Comida", type:"e"});
+  const [form,   setForm]   = useState({name:"", amount:"", cat:"Comida", type:"e", date: todayISO()});
 
   useEffect(() => { save("fivvy_txs",    txs);    }, [txs]);
   useEffect(() => { save("fivvy_pro",    isPro);  }, [isPro]);
@@ -342,10 +341,10 @@ export default function App() {
     const amount = form.type === "e"
       ? -Math.abs(parseFloat(form.amount))
       :  Math.abs(parseFloat(form.amount));
-    const today = new Date().toLocaleDateString("es-EC",{day:"2-digit",month:"short"});
-    setTxs(p => [{id:nextId, name:form.name, cat:form.cat, amount, date:today, type:form.type}, ...p]);
+    const date = form.date ? fmtDate(form.date) : fmtDate(todayISO());
+    setTxs(p => [{id:nextId, name:form.name, cat:form.cat, amount, date, type:form.type}, ...p]);
     setNextId(n => n + 1);
-    setForm(f => ({...f, name:"", amount:""}));
+    setForm(f => ({...f, name:"", amount:"", date: todayISO()}));
   }, [form, nextId]);
 
   const delTx = useCallback(id => setTxs(p => p.filter(t => t.id !== id)), []);
