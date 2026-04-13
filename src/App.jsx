@@ -204,7 +204,7 @@ function UpgradeModal({ onClose, onSuccess }) {
   const [plan,    setPlan]    = useState("pro");
   const [step,    setStep]    = useState("pick");
 
-  const price  = billing === "annual" ? 7.99 : 9.99;
+  const price  = billing === "annual" ? 79.99 : 9.99;
   const total  = billing === "annual" ? (price * 12).toFixed(2) : price.toFixed(2);
   const period = billing === "annual" ? "/año" : "/mes";
   const url    = billing === "annual" ? LS_ANNUAL : LS_MONTHLY;
@@ -225,7 +225,7 @@ function UpgradeModal({ onClose, onSuccess }) {
           <div style={{fontSize:".82rem",color:"var(--muted)",marginBottom:"1.25rem",lineHeight:1.5}}>Sin contratos · cancela cuando quieras</div>
           <div className="btoggle">
             <button className={billing === "monthly" ? "on" : ""} onClick={() => setBilling("monthly")}>Mensual</button>
-            <button className={billing === "annual"  ? "on" : ""} onClick={() => setBilling("annual")}>Anual — 20% off</button>
+            <button className={billing === "annual"  ? "on" : ""} onClick={() => setBilling("annual")}>Anual — 33% off</button>
           </div>
           <div className="plans">
             <div className={`plan ${plan === "free" ? "sel" : ""}`} onClick={() => setPlan("free")}>
@@ -244,7 +244,7 @@ function UpgradeModal({ onClose, onSuccess }) {
               <div className="plan-price" style={{color:"var(--gold)"}}>
                 ${price.toFixed(2)}<span>{period}</span>
               </div>
-              {billing === "annual" && <div className="plan-save">Ahorras $23.88/año</div>}
+              {billing === "annual" && <div className="plan-save">Ahorras $39.89/año</div>}
               <ul className="plan-feats">
                 <li className="y">Todo Free</li>
                 <li className="y">Reportes</li>
