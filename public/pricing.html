@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="fivvy — Planes y precios. Controla tus finanzas personales desde $9.99/mes."/>
+<title>Precios — fivvy.</title>
+<link rel="icon" type="image/png" href="/icons/icon-192.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f0f0f;--paper:#f7f6f2;--cream:#eeecea;--line:#e0ddd8;
+  --green:#1a7a4a;--red:#c0392b;--gold:#b8860b;--muted:#8a8680;--card:#fff;
+  --font:'Outfit',sans-serif;--mono:'IBM Plex Mono',monospace;
+}
+html{font-size:16px}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(247,246,242,.92);backdrop-filter:blur(12px);z-index:100}
+.logo{font-size:1.4rem;font-weight:700;text-decoration:none;color:var(--ink)}
+.logo em{font-style:normal;font-weight:300;color:var(--muted)}
+.nav-cta{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.45rem .9rem;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none}
+
+/* HERO */
+.hero{text-align:center;padding:4rem 1.5rem 3rem}
+.hero-tag{font-family:var(--mono);font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+.hero-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:700;letter-spacing:-1px;line-height:1.1;margin-bottom:1rem}
+.hero-title span{color:var(--gold)}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:480px;margin:0 auto 2rem;line-height:1.6}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;justify-content:center;margin-bottom:3rem}
+.toggle{display:flex;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.toggle button{padding:.5rem 1.25rem;border:none;border-radius:999px;background:none;font-family:var(--font);font-size:.85rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s}
+.toggle button.on{background:var(--ink);color:var(--paper)}
+.save-tag{display:inline-block;background:rgba(26,122,74,.1);color:var(--green);font-family:var(--mono);font-size:.62rem;letter-spacing:1px;padding:.2rem .5rem;border-radius:999px;margin-left:.5rem;vertical-align:middle}
+
+/* PLANS */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;max-width:760px;margin:0 auto;padding:0 1.5rem 4rem}
+.plan{background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:2rem;position:relative;transition:border-color .2s}
+.plan.featured{border-color:var(--ink)}
+.plan-popular{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;padding:.3rem .85rem;border-radius:999px;white-space:nowrap}
+.plan-name{font-family:var(--mono);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+.plan-price{font-size:2.75rem;font-weight:700;letter-spacing:-1.5px;line-height:1;margin-bottom:.25rem}
+.plan-price.gold{color:var(--gold)}
+.plan-period{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:.5rem}
+.plan-save{font-family:var(--mono);font-size:.68rem;color:var(--green);margin-bottom:1.5rem}
+.plan-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5}
+.plan-btn{width:100%;padding:.82rem;border:none;border-radius:4px;font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;display:block;text-align:center}
+.plan-btn.outline{background:none;border:1.5px solid var(--line);color:var(--ink)}
+.plan-btn.outline:hover{border-color:var(--ink)}
+.plan-btn.solid{background:var(--ink);color:var(--paper)}
+.plan-btn.solid:hover{opacity:.85}
+.divider{border:none;border-top:1px solid var(--line);margin:1.5rem 0}
+.feat-title{font-family:var(--mono);font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.feat-list li{font-size:.85rem;display:flex;gap:.6rem;align-items:flex-start;line-height:1.4}
+.feat-list li .y{color:var(--green);flex-shrink:0;font-weight:700}
+.feat-list li .n{color:var(--muted);flex-shrink:0}
+.feat-list li.dim{color:var(--muted)}
+
+/* COMPARE TABLE */
+.compare{max-width:760px;margin:0 auto;padding:0 1.5rem 5rem}
+.compare-title{font-size:1.5rem;font-weight:700;text-align:center;margin-bottom:2rem}
+.table{width:100%;border-collapse:collapse}
+.table th{font-family:var(--mono);font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:.75rem 1rem;text-align:left;border-bottom:2px solid var(--ink)}
+.table th:not(:first-child){text-align:center}
+.table td{padding:.85rem 1rem;border-bottom:1px solid var(--line);font-size:.875rem}
+.table td:not(:first-child){text-align:center;font-family:var(--mono);font-size:.8rem}
+.table tr:last-child td{border-bottom:none}
+.check{color:var(--green);font-weight:700}
+.cross{color:var(--muted)}
+
+/* FAQ */
+.faq{max-width:600px;margin:0 auto;padding:0 1.5rem 5rem}
+.faq-title{font-size:1.5rem;font-weight:700;text-align:center;margin-bottom:2rem}
+.faq-item{border-bottom:1px solid var(--line);padding:1.25rem 0}
+.faq-q{font-size:.95rem;font-weight:600;margin-bottom:.5rem}
+.faq-a{font-size:.875rem;color:var(--muted);line-height:1.6}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--line);padding:2rem 1.5rem;text-align:center}
+.footer-logo{font-size:1.2rem;font-weight:700;margin-bottom:.5rem}
+.footer-logo em{font-style:normal;font-weight:300;color:var(--muted)}
+.footer-text{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.5px}
+
+@media(max-width:580px){
+  .plans{grid-template-columns:1fr;max-width:400px}
+  .nav{padding:1rem}
+  .hero{padding:3rem 1rem 2rem}
+  .table th:first-child,.table td:first-child{font-size:.78rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="logo" href="/">fivvy<em>.</em></a>
+  <a class="nav-cta" href="/">Abrir app →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Planes y precios</div>
+  <h1 class="hero-title">Simple. Transparente.<br><span>Sin sorpresas.</span></h1>
+  <p class="hero-sub">Empieza gratis y mejora cuando quieras. Sin contratos, sin letra pequeña. Cancela en cualquier momento.</p>
+</section>
+
+<!-- TOGGLE -->
+<div class="toggle-wrap">
+  <div class="toggle">
+    <button class="on" id="btnMonthly" onclick="setBilling('monthly')">Mensual</button>
+    <button id="btnAnnual" onclick="setBilling('annual')">Anual <span class="save-tag">20% off</span></button>
+  </div>
+</div>
+
+<!-- PLANS -->
+<div class="plans">
+
+  <!-- FREE -->
+  <div class="plan">
+    <div class="plan-name">Free</div>
+    <div class="plan-price">$0</div>
+    <div class="plan-period">Para siempre</div>
+    <div class="plan-desc">Perfecto para empezar a ordenar tus finanzas sin gastar nada.</div>
+    <a href="/" class="plan-btn outline">Empezar gratis</a>
+    <hr class="divider"/>
+    <div class="feat-title">Incluye</div>
+    <ul class="feat-list">
+      <li><span class="y">✓</span> Dashboard con balance mensual</li>
+      <li><span class="y">✓</span> Registro de ingresos y gastos</li>
+      <li><span class="y">✓</span> Presupuestos por categoría</li>
+      <li><span class="y">✓</span> Historial del mes actual</li>
+      <li><span class="y">✓</span> Funciona como app en tu celular</li>
+      <li class="dim"><span class="n">–</span> Reportes avanzados</li>
+      <li class="dim"><span class="n">–</span> Metas de ahorro</li>
+      <li class="dim"><span class="n">–</span> Exportar datos</li>
+    </ul>
+  </div>
+
+  <!-- PRO -->
+  <div class="plan featured">
+    <div class="plan-popular">Más popular</div>
+    <div class="plan-name">Pro</div>
+    <div class="plan-price gold" id="proPrice">$9.99</div>
+    <div class="plan-period" id="proPeriod">por mes · facturado mensualmente</div>
+    <div class="plan-save" id="proSave" style="visibility:hidden">Ahorras $23.88 al año</div>
+    <div class="plan-desc">Control total de tus finanzas. Todo lo que necesitas para alcanzar tus metas.</div>
+    <a href="/" id="proCta" class="plan-btn solid">Empezar Pro →</a>
+    <hr class="divider"/>
+    <div class="feat-title">Todo Free, más:</div>
+    <ul class="feat-list">
+      <li><span class="y">✓</span> Reportes avanzados con gráficas</li>
+      <li><span class="y">✓</span> Comparativa mes a mes</li>
+      <li><span class="y">✓</span> Metas de ahorro con progreso</li>
+      <li><span class="y">✓</span> Exportar a PDF y Excel</li>
+      <li><span class="y">✓</span> Presupuestos personalizados</li>
+      <li><span class="y">✓</span> Historial ilimitado</li>
+      <li><span class="y">✓</span> Insights con IA</li>
+      <li><span class="y">✓</span> Soporte prioritario</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- COMPARE TABLE -->
+<section class="compare">
+  <h2 class="compare-title">Comparativa completa</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Función</th>
+        <th>Free</th>
+        <th>Pro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Dashboard con balance</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Registro de movimientos</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Presupuestos fijos</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>App instalable en móvil (PWA)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Historial de transacciones</td><td>Mes actual</td><td>Ilimitado</td></tr>
+      <tr><td>Reportes con gráficas</td><td><span class="cross">–</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Comparativa mensual</td><td><span class="cross">–</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Metas de ahorro</td><td><span class="cross">–</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Exportar PDF / Excel</td><td><span class="cross">–</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Presupuestos personalizados</td><td><span class="cross">–</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Insights con IA</td><td><span class="cross">–</span></td><td><span class="check">✓</span></td></tr>
+      <tr><td>Soporte</td><td>Comunidad</td><td>Prioritario</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <h2 class="faq-title">Preguntas frecuentes</h2>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Puedo cancelar cuando quiera?</div>
+    <div class="faq-a">Sí, sin penalizaciones ni contratos. Cancela en cualquier momento desde tu cuenta y no se te cobrará el siguiente período.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">¿Qué métodos de pago aceptan?</div>
+    <div class="faq-a">Aceptamos tarjetas Visa, Mastercard, American Express, Apple Pay y PayPal. Los pagos son procesados de forma segura.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">¿Mis datos están seguros?</div>
+    <div class="faq-a">Tus datos financieros se guardan localmente en tu dispositivo. No los almacenamos en servidores externos ni los compartimos con terceros.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">¿Funciona en iPhone y Android?</div>
+    <div class="faq-a">Sí. fivvy es una PWA — puedes instalarla en cualquier dispositivo desde el navegador sin necesidad de App Store o Google Play.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">¿Hay un período de prueba?</div>
+    <div class="faq-a">El plan Free es gratuito para siempre y no requiere tarjeta de crédito. Prueba la app sin compromisos y mejora cuando lo necesites.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">¿En qué moneda se cobra?</div>
+    <div class="faq-a">Los precios están en dólares estadounidenses (USD). El cargo aparecerá en USD en tu estado de cuenta.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">fivvy<em>.</em></div>
+  <div class="footer-text">© 2026 fivvy · Todos los derechos reservados</div>
+</footer>
+
+<script>
+  let billing = 'monthly';
+
+  function setBilling(b) {
+    billing = b;
+    document.getElementById('btnMonthly').className = b === 'monthly' ? 'on' : '';
+    document.getElementById('btnAnnual').className  = b === 'annual'  ? 'on' : '';
+
+    if (b === 'annual') {
+      document.getElementById('proPrice').textContent  = '$7.99';
+      document.getElementById('proPeriod').textContent = 'por mes · facturado $95.88/año';
+      document.getElementById('proSave').style.visibility = 'visible';
+    } else {
+      document.getElementById('proPrice').textContent  = '$9.99';
+      document.getElementById('proPeriod').textContent = 'por mes · facturado mensualmente';
+      document.getElementById('proSave').style.visibility = 'hidden';
+    }
+  }
+</script>
+</body>
+</html>
